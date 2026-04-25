@@ -1,0 +1,293 @@
+{
+  "name": "AI story Generator Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Ai Story Generator",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "Genre",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Sci-Fi"
+                  },
+                  {
+                    "option": "Mystery"
+                  },
+                  {
+                    "option": "Comedy"
+                  },
+                  {
+                    "option": "Horror"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Theme"
+            },
+            {
+              "fieldLabel": "Age Group",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Children(5-8)"
+                  },
+                  {
+                    "option": "Teens(13-17)"
+                  },
+                  {
+                    "option": "Adults"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -1024,
+        -32
+      ],
+      "id": "416b4267-3e3d-44e2-98e7-baa8f4acdf25",
+      "name": "On form submission",
+      "webhookId": "a7e268f8-daaf-44c4-9d1a-a29d0b25171d"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1_WRLIBpSQIYpM14hHgJm6hAKS_OIuQAaOHJv-4Z27ks",
+          "mode": "list",
+          "cachedResultName": "Ai Story Generator Bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_WRLIBpSQIYpM14hHgJm6hAKS_OIuQAaOHJv-4Z27ks/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_WRLIBpSQIYpM14hHgJm6hAKS_OIuQAaOHJv-4Z27ks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Genre": "={{ $('On form submission').item.json.Genre }}",
+            "Theme": "={{ $('On form submission').item.json.Theme }}",
+            "Age Group": "={{ $('On form submission').item.json['Age Group'] }}",
+            "Generated Story": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Genre",
+              "displayName": "Genre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Theme",
+              "displayName": "Theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Age Group",
+              "displayName": "Age Group",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Generated Story",
+              "displayName": "Generated Story",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -288,
+        -48
+      ],
+      "id": "eda4ed36-2d3a-4331-b5de-4db5f5aa2d62",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5DJZcK4S1U23ZRvv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Your AI-Generated {{ $('On form submission').item.json.Genre }} Story is Ready!",
+        "emailType": "text",
+        "message": "={{ $json['Generated Story'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        -48
+      ],
+      "id": "d6ea6b4d-062a-4c7c-b32b-d69dd0b8dfa1",
+      "name": "Send a message",
+      "webhookId": "45abd0af-4d82-4fb0-94d6-4a3c361e6241",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8OWiRuGnZqMS2nQM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a {{$json.Genre}} story about {{$json.Theme}} for {{$json[\"Age Group\"]}} with a moral lesson.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -688,
+        -32
+      ],
+      "id": "30a2199b-66eb-4e2c-8578-d36e385f40b7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        144
+      ],
+      "id": "202fb075-bf57-4e2b-8232-5b6ec66d85a8",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "dx3445R27rz36xxU",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "546be700-afbb-4304-977c-063bff7550ee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cc21d2c2d1d60df2520a0875973189adbd90a98fcd86a126f281af02da057982"
+  },
+  "id": "uvPfMAPJpqTWrDIE",
+  "tags": []
+}
