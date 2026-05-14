@@ -1,0 +1,617 @@
+{
+  "name": "AI-Powered Story Generator Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Story Generator",
+        "formDescription": "Fill in the details below to generate your personalized story",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "fieldName": "Name",
+              "placeholder": "Enter your name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "fieldName": "Email",
+              "placeholder": "your.email@example.com"
+            },
+            {
+              "fieldLabel": "Genre",
+              "fieldName": "Genre",
+              "placeholder": "e.g., Fantasy, Adventure, Mystery"
+            },
+            {
+              "fieldLabel": "Theme",
+              "fieldName": "Theme",
+              "placeholder": "e.g., Friendship, Courage, Discovery"
+            },
+            {
+              "fieldLabel": "Age Group",
+              "fieldName": "Age Group",
+              "placeholder": "e.g., Children, Teens, Adults"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "670fc171-f293-4308-bc59-96babbd36a3e",
+      "name": "Story Request Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        240,
+        528
+      ],
+      "webhookId": "1b47d67e-3dc6-4fa6-ba7f-df331a32207c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.Name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "id": "9bafebe2-1ebe-42f8-8c50-8f719105f154"
+            },
+            {
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "id": "c4d5aa1d-746f-49a5-b6c6-80547b81e0c3"
+            },
+            {
+              "leftValue": "={{ $json.Genre }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "id": "59a274c4-c239-4e41-a7b1-b818c6f2fbac"
+            },
+            {
+              "leftValue": "={{ $json.Theme }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "id": "d61310b3-6425-462c-88d5-e88ab66ba72d"
+            },
+            {
+              "leftValue": "={{ $json[\"Age Group\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              },
+              "id": "efab4670-2ff1-4e7c-b139-d45bb4d289fb"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4fc19f8f-cfee-44f6-8580-d6502d3ec423",
+      "name": "Validate All Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a detailed and creative 250-300 word story for {{$json[\"Age Group\"]}} audience.\n\nGenre: {{$json[\"Genre\"]}}\nTheme: {{$json[\"Theme\"]}}\n\nRequirements:\n- Make the story engaging and descriptive\n- Include characters and events\n- Add a meaningful moral at the end\n\nReturn output ONLY in this JSON format:\n\n{\n  \"story\": \"full detailed story here\",\n  \"moral\": \"moral here\",\n  \"creativity_score\": \"score out of 10\",\n  \"engagement_score\": \"score out of 10\",\n  \"overall_rating\": \"score out of 10\"\n}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are a creative storyteller. Generate stories in the exact format requested with title, story content (250-300 words), and moral lesson. Return only the structured JSON output."
+        }
+      },
+      "id": "c1ee2e91-95bc-4732-a934-c6c984ee5ce0",
+      "name": "AI Story Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        688,
+        224
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {
+          "maxTokensToSample": 1000,
+          "temperature": 0.7
+        }
+      },
+      "id": "2a6fcadc-f12b-418d-bd6f-b5671a565a63",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        656,
+        480
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "Vapp869aDKO5K6xn",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "Name",
+              "value": "={{ $(\"Story Request Form\").item.json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "Email",
+              "value": "={{ $(\"Story Request Form\").item.json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "Genre",
+              "value": "={{ $(\"Story Request Form\").item.json.Genre }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "Theme",
+              "value": "={{ $(\"Story Request Form\").item.json.Theme }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "Age Group",
+              "value": "={{ $(\"Story Request Form\").item.json[\"Age Group\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "7",
+              "name": "story",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "deaebe32-cc35-4840-a461-c13a410375f5",
+              "name": "creativity_score",
+              "value": "={{ JSON.parse($json.output).creativity_score }}",
+              "type": "string"
+            },
+            {
+              "id": "f2e635c3-d60e-4380-b991-975fccb34e04",
+              "name": "engagement_score",
+              "value": "={{ JSON.parse($json.output).engagement_score }}",
+              "type": "string"
+            },
+            {
+              "id": "3a1c810c-6f29-4f3f-a067-20490a1e9b93",
+              "name": "overall_rating",
+              "value": "={{ JSON.parse($json.output).overall_rating }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0e2e903c-b162-4ceb-ac61-effff9fd485e",
+      "name": "Extract Story Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_WRLIBpSQIYpM14hHgJm6hAKS_OIuQAaOHJv-4Z27ks",
+          "mode": "list",
+          "cachedResultName": "Ai Story Generator Bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_WRLIBpSQIYpM14hHgJm6hAKS_OIuQAaOHJv-4Z27ks/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_WRLIBpSQIYpM14hHgJm6hAKS_OIuQAaOHJv-4Z27ks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Validate All Fields').item.json.submittedAt }}",
+            "Email": "={{ $json.Email }}",
+            "Name": "={{ $json.Name }}",
+            "Genre": "={{ $json.Genre }}",
+            "Theme": "={{ $json.Theme }}",
+            "AgeGroup": "={{ $json['Age Group'] }}",
+            "Story": "={{ $json.story }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Genre",
+              "displayName": "Genre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Theme",
+              "displayName": "Theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AgeGroup",
+              "displayName": "AgeGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Story",
+              "displayName": "Story",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "ed881429-bffe-4f1d-84d8-f817f81156ef",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        256
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aMKg5NSX3R7yCwLk",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Your AI Generated Story",
+        "message": "=Hello {{ $json.Name }},<br><br>Here is your personalized story:<br><br><h2></h2><br><p>{{ $('Extract Story Fields').item.json.story }}</p><br><br><strong></strong><br><br><br>\nEnjoy your story!\n<br><br>Best regards,\n<br>AI Story Generator\n\nPlease rate your story and provide feedback here:\n\nhttps://forms.gle/LpajdDnC8VebfjL2A\n\nYour feedback helps us improve the AI-generated stories.",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "8bbefa8a-8ece-45c8-9fb9-652f32fe914f",
+      "name": "Send Story Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        256
+      ],
+      "webhookId": "d22b7838-a718-413e-894b-9015e03dceb5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UTfXWXbVFmGWCku8",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "status",
+              "value": "success",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "message",
+              "value": "Story generated and sent successfully",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dddf4acf-4fa3-4e23-a29d-2ee34d755ca6",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "message",
+              "value": "AI generation failed",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "502e518a-6a7a-44da-b123-a2e3aa082179",
+      "name": "AI Error Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        464
+      ],
+      "alwaysOutputData": false,
+      "notesInFlow": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8641f53e-e659-4ff7-a9eb-640b03dc8ce0",
+              "name": "Status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "145c072e-bba4-46ff-9eb3-39c1cb1d3e68",
+              "name": "Message",
+              "value": "Missing required Fields",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4259d7e-a92d-4456-9398-4c3d4688672a",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        480
+      ],
+      "id": "895acf10-4348-4d12-9d1c-832b994e1ef4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "tsH2fgBb3DZZ35UW",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Story Request Form": {
+      "main": [
+        [
+          {
+            "node": "Validate All Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate All Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Story Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Story Generator": {
+      "main": [
+        [
+          {
+            "node": "Extract Story Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Story Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Story Fields": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Story Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Story Email": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Response": {
+      "main": [
+        []
+      ]
+    },
+    "AI Error Response": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Story Generator",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f07182f9-d0f3-4bef-a0ce-ed87f67fe90e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "27bfb82b602fc993d60420b0a41624c425641e5bd065d6832ad73b32ea21fdfd"
+  },
+  "id": "pfsCQgkmEDgEJymu",
+  "tags": []
+}
